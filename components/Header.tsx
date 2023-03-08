@@ -11,7 +11,7 @@ import { HomeIcon } from "@heroicons/react/24/solid";
 
 function Header() {
   return (
-    <div className="sticky top-0 border-b shadow-sm z-50">
+    <header className="sticky top-0 border-b shadow-sm z-50">
       <div className="mx-5 max-w-6xl flex justify-between bg-white lg:mx-auto">
         {/* Logo */}
         <div className="hidden w-24 relative cursor-pointer lg:inline-grid">
@@ -65,7 +65,7 @@ function Header() {
           />
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
