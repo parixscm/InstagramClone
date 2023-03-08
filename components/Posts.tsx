@@ -1,3 +1,5 @@
+import Post from "./Post";
+
 type IPost = {
   id: string;
   username: string;
@@ -26,7 +28,7 @@ const posts: IPost[] = [
 function Posts() {
   return (
     <div>
-      {/* {posts.map(({ id, username, userImg, postImg, caption }: IPost) => (
+      {posts.map(({ id, username, userImg, postImg, caption }: IPost) => (
         <Post
           key={id}
           id={id}
@@ -35,7 +37,7 @@ function Posts() {
           postImg={postImg}
           caption={caption}
         />
-      ))} */}
+      ))}
     </div>
   );
 }
