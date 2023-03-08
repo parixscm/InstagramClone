@@ -32,3 +32,12 @@ type StoryProps = {
   img: string;
   username: string;
 };
+
+// Posts.tsx, Post.tsx
+type IPost = {
+  id: string;
+  username: string;
+  userImg: string;
+  postImg: string;
+  caption: string;
+};

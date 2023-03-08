@@ -1,12 +1,5 @@
+import { IPost } from "../typings";
 import Post from "./Post";
-
-type IPost = {
-  id: string;
-  username: string;
-  userImg: string;
-  postImg: string;
-  caption: string;
-};
 
 const posts: IPost[] = [
   {
