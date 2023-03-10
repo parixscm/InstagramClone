@@ -10,9 +10,6 @@ const Home: NextPage = () => {
         <title>Instagram Clone</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* Header */}
-      <Header />
-
       {/* Feed */}
       <Feed />
 
