@@ -14,8 +14,6 @@ function signInPage({
     ClientSafeProvider
   >;
 }) {
-  console.log(providers);
-
   return (
     <>
       {Object.values(providers).map(provider => (
