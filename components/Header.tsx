@@ -9,15 +9,20 @@ import {
 } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/solid";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 function Header() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 border-b shadow-sm z-50 bg-white">
       <div className="mx-5 max-w-6xl flex justify-between bg-white lg:mx-auto">
         {/* Logo */}
-        <div className="hidden w-24 relative cursor-pointer lg:inline-grid">
+        <div
+          onClick={() => router.push("/")}
+          className="hidden w-24 relative cursor-pointer lg:inline-grid"
+        >
           <Image
             src="https://links.papareact.com/ocw"
             alt="logo_lg"
@@ -25,7 +30,10 @@ function Header() {
             className="object-contain"
           />
         </div>
-        <div className="w-10 flex-shrink-0 relative cursor-pointer lg:hidden">
+        <div
+          onClick={() => router.push("/")}
+          className="w-10 flex-shrink-0 relative cursor-pointer lg:hidden"
+        >
           <Image
             src="https://links.papareact.com/jjm"
             alt="logo_mobile"
@@ -50,7 +58,7 @@ function Header() {
 
         {/* Buttons */}
         <div className="flex justify-end items-center space-x-4">
-          <HomeIcon className="navBtn" />
+          <HomeIcon onClick={() => router.push("/")} className="navBtn" />
           <Bars3Icon className="h-6 md:hidden cursor-pointer" />
 
           {session ? (
