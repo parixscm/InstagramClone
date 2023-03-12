@@ -13,7 +13,7 @@ function Modal() {
     null
   );
 
-  // Firebase setting
+  // FIREBASE setting needs to be done
   const uploadPost = async () => {
     if (isLoading) return;
     setIsLoading(true);
