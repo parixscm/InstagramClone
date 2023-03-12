@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import {
   MagnifyingGlassIcon,
   PlusCircleIcon,
@@ -8,10 +10,11 @@ import {
   HeartIcon,
 } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/solid";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRecoilState } from "recoil";
+import { modalState } from "../atoms/modalAtom";
 
 function Header() {
+  const [open, setOpen] = useRecoilState(modalState);
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -69,7 +72,10 @@ function Header() {
                   7
                 </div>
               </div>
-              <PlusCircleIcon className="navBtn" />
+              <PlusCircleIcon
+                onClick={() => setOpen(prev => !prev)}
+                className="navBtn"
+              />
               <UserGroupIcon className="navBtn" />
               <HeartIcon className="navBtn" />
               <img
