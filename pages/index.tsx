@@ -7,7 +7,7 @@ const Home: NextPage = () => {
   return (
     <div className="bg-gray-50 h-screen overflow-y-scroll scrollbar-hide">
       <Head>
-        <title>Instagram Clone</title>
+        <title>Jinsta Clone</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* Feed */}
