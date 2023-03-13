@@ -1,5 +1,21 @@
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { IPost } from "../typings";
+import { db } from "../firebase";
+import {
+  doc,
+  addDoc,
+  setDoc,
+  deleteDoc,
+  serverTimestamp,
+  onSnapshot,
+  collection,
+  query,
+  orderBy,
+  DocumentData,
+  QuerySnapshot,
+  QueryDocumentSnapshot,
+} from "firebase/firestore";
 import {
   HeartIcon,
   BookmarkIcon,
@@ -9,24 +25,13 @@ import {
   ChatBubbleLeftEllipsisIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as FilledHeartIcon } from "@heroicons/react/24/solid";
-import { useSession } from "next-auth/react";
-import {
-  addDoc,
-  serverTimestamp,
-  onSnapshot,
-  collection,
-  query,
-  orderBy,
-  QuerySnapshot,
-  DocumentData,
-  QueryDocumentSnapshot,
-} from "firebase/firestore";
-import { db } from "../firebase";
 import Moment from "react-moment";
 
 function Post({ id, username, userImg, postImg, caption }: IPost) {
   const { data: session } = useSession();
   const [comment, setComment] = useState("");
+  const [hasLiked, setHasLiked] = useState(false);
+  const [likes, setLikes] = useState<QueryDocumentSnapshot<DocumentData>[]>();
   const [comments, setComments] =
     useState<QueryDocumentSnapshot<DocumentData>[]>();
 
@@ -42,17 +47,48 @@ function Post({ id, username, userImg, postImg, caption }: IPost) {
     });
   };
 
-  useEffect(() => {
-    onSnapshot(
-      query(
-        collection(db, "posts", id, "comments"),
-        orderBy("timestamp", "desc")
+  const likePost = async () => {
+    if (hasLiked) {
+      await deleteDoc(doc(db, "posts", id, "likes", session?.user.uid!));
+    } else {
+      await setDoc(doc(db, "posts", id, "likes", session?.user.uid!), {
+        username: session?.user.username,
+      });
+    }
+  };
+
+  useEffect(
+    () =>
+      onSnapshot(
+        query(
+          collection(db, "posts", id, "comments"),
+          orderBy("timestamp", "desc")
+        ),
+        (snapshot: QuerySnapshot<DocumentData>) => {
+          setComments(snapshot.docs);
+        }
       ),
-      (snapshot: QuerySnapshot<DocumentData>) => {
-        setComments(snapshot.docs);
-      }
+    [db, id]
+  );
+
+  useEffect(
+    () =>
+      onSnapshot(
+        collection(db, "posts", id, "likes"),
+        (snapshot: QuerySnapshot<DocumentData>) => {
+          setLikes(snapshot.docs);
+        }
+      ),
+    [db, id]
+  );
+
+  useEffect(() => {
+    setHasLiked(
+      likes?.findIndex(like => like.id === session?.user?.uid) !== -1
     );
-  }, [db]);
+  }, [likes]);
+
+  console.log(`${id} - ${hasLiked}`);
 
   return (
     <div className="my-7 bg-white border rounded-sm">
@@ -74,7 +110,14 @@ function Post({ id, username, userImg, postImg, caption }: IPost) {
       {session && (
         <div className="px-4 pt-4 flex justify-between">
           <div className="flex space-x-4">
-            <HeartIcon className="postBtn" />
+            {hasLiked ? (
+              <FilledHeartIcon
+                onClick={likePost}
+                className="postBtn text-red-500"
+              />
+            ) : (
+              <HeartIcon onClick={likePost} className="postBtn" />
+            )}
             <ChatBubbleLeftEllipsisIcon className="postBtn" />
             <PaperAirplaneIcon className="postBtn" />
           </div>
@@ -84,6 +127,9 @@ function Post({ id, username, userImg, postImg, caption }: IPost) {
 
       {/* Caption */}
       <p className="p-5 truncate">
+        {likes?.length! > 0 && (
+          <p className="mb-1 font-bold">{likes?.length!} likes</p>
+        )}
         <span className="mr-1 font-bold">{username} </span>
         {caption}
       </p>
