@@ -25,7 +25,7 @@ import {
   ChatBubbleLeftEllipsisIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as FilledHeartIcon } from "@heroicons/react/24/solid";
-import Moment from "react-moment";
+import Comment from "./Comment";
 
 function Post({ id, username, userImg, postImg, caption }: IPost) {
   const { data: session } = useSession();
@@ -138,22 +138,13 @@ function Post({ id, username, userImg, postImg, caption }: IPost) {
       {comments?.length! > 0 && (
         <div className="h-20 ml-10 overflow-y-scroll scrollbar-thin scrollbar-thumb-black">
           {comments?.map(comment => (
-            <div key={comment.id} className="mb-3 flex items-center space-x-2">
-              <img
-                src={comment.data().userImage}
-                alt="profile_image"
-                className="h-7 rounded-full"
-              />
-              <p className="text-sm flex-1">
-                <span className="mr-2 font-bold">
-                  {comment.data().username}
-                </span>
-                {comment.data().comment}
-              </p>
-              <Moment fromNow className="pr-5 text-xs">
-                {comment.data().timestamp?.toDate()}
-              </Moment>
-            </div>
+            <Comment
+              key={comment.id}
+              username={comment.data().username}
+              userImage={comment.data().userImage}
+              comment={comment.data().comment}
+              timestamp={comment.data().timestamp}
+            />
           ))}
         </div>
       )}
