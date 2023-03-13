@@ -9,6 +9,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  secret: process.env.NEXT_AUTH_SECRET,
   pages: {
     signIn: "/auth/signin",
   },
@@ -21,7 +22,6 @@ export const authOptions = {
       session.user.uid = token.sub;
       return session;
     },
-    secret: process.env.NEXT_AUTH_SECRET,
   },
 };
 
