@@ -3,12 +3,23 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useRecoilState } from "recoil";
 import { modalState } from "../atoms/modalAtom";
 import { CameraIcon } from "@heroicons/react/24/outline";
+import {
+  doc,
+  addDoc,
+  updateDoc,
+  collection,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db, storage } from "../firebase";
+import { useSession } from "next-auth/react";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
 function Modal() {
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useRecoilState(modalState);
-  const [isLoading, setIsLoading] = useState(false);
   const filePickerRef = useRef<HTMLInputElement>(null);
   const captionRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<string | ArrayBuffer | null>(
     null
   );
@@ -17,6 +28,32 @@ function Modal() {
   const uploadPost = async () => {
     if (isLoading) return;
     setIsLoading(true);
+
+    // 1) create a post and add to firestore 'posts' collection
+    const docRef = await addDoc(collection(db, "posts"), {
+      username: session?.user.username,
+      caption: captionRef.current!.value,
+      profileImg: session?.user.image,
+      timestamp: serverTimestamp(),
+    });
+
+    // 2) get the post id for the newly created post
+    console.log("New Doc Added with ID: ", docRef.id);
+
+    // 3) upload the image to the firebase storage with the post ID
+    // 4) get a download url from firebase storage and update the original post with image
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+    await uploadString(imageRef, selectedFile as string, "data_url").then(
+      async snapshot => {
+        const downloadURL = await getDownloadURL(imageRef);
+        await updateDoc(doc(db, "posts", docRef.id), {
+          image: downloadURL,
+        });
+      }
+    );
+    setIsOpen(false);
+    setIsLoading(false);
+    setSelectedFile(null);
   };
 
   const addImageToPost = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,9 +149,11 @@ function Modal() {
                 <div className="mt-5 sm:mt-6">
                   <button
                     type="button"
+                    disabled={!selectedFile}
                     className="w-full px-4 py-2 inline-flex justify-center rounded-md border border-transparent outline-none shadow-sm bg-red-600 text-base text-white font-medium hover:bg-red-700 hover:disabled:bg-gray-300 focus:ring focus:ring-offset-2 focus:ring-red-500 sm:text-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    onClick={uploadPost}
                   >
-                    Upload Post
+                    {isLoading ? "Uploading..." : "Upload Post"}
                   </button>
                 </div>
               </div>
